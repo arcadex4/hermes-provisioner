@@ -30,6 +30,8 @@ jobs:
 
       - name: Try to provision instance
         run: |
+          set +e
+          echo "${{ secrets.SSH_PUBLIC_KEY }}" > /tmp/ssh_key.pub
           for AD in "AQIi:US-ASHBURN-AD-1" "AQIi:US-ASHBURN-AD-2" "AQIi:US-ASHBURN-AD-3"; do
             echo "Trying $AD..."
             result=$(oci compute instance launch \
@@ -41,7 +43,7 @@ jobs:
               --subnet-id "ocid1.subnet.oc1.iad.aaaaaaaacbrs3qjvzlnfih65wsdww6agxlfvcehre2swh3tiqmen5tdcy22a" \
               --assign-public-ip true \
               --display-name "hermes" \
-              --ssh-authorized-keys-file <(echo "${{ secrets.SSH_PUBLIC_KEY }}") 2>&1) || true
+              --ssh-authorized-keys-file /tmp/ssh_key.pub 2>&1)
             if echo "$result" | grep -q '"id"'; then
               echo "SUCCESS!"
               echo "$result"
