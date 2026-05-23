@@ -27,6 +27,7 @@ jobs:
           region=${{ secrets.OCI_REGION }}
           key_file=~/.oci/oci_api_key.pem
           EOF
+          chmod 600 ~/.oci/config
 
       - name: Try to provision instance
         run: |
