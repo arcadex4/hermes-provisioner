@@ -8,7 +8,7 @@ on:
 jobs:
   provision:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - name: Install OCI CLI
         run: pip install oci-cli
@@ -45,7 +45,7 @@ jobs:
               --display-name "hermes" \
               --ssh-authorized-keys-file /tmp/ssh_key.pub \
               --connection-timeout 10 \
-              --read-timeout 30 2>&1)
+              --read-timeout 20 2>&1)
             if echo "$result" | grep -q '"id"'; then
               echo "SUCCESS!"
               echo "$result"
