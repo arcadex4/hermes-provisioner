@@ -8,11 +8,10 @@ on:
 jobs:
   provision:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Install OCI CLI
-        run: |
-          curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh | bash -s -- --accept-all-defaults
-          echo "$HOME/bin" >> $GITHUB_PATH
+        run: pip install oci-cli
 
       - name: Configure OCI
         run: |
@@ -40,11 +39,13 @@ jobs:
               --availability-domain "$AD" \
               --shape "VM.Standard.A1.Flex" \
               --shape-config '{"ocpus": 4, "memoryInGBs": 24}' \
-              --image-id "ocid1.image.oc1.iad.aaaaaaaa43mhod2mxpjivckby6qsa2cmy6x3hj6bgb2xplozrib3edslmnpq" \
-              --subnet-id "ocid1.subnet.oc1.iad.aaaaaaaacbrs3qjvzlnfih65wsdww6agxlfvcehre2swh3tiqmen5tdcy22a" \
+              --image-id "${{ secrets.OCI_IMAGE_ID }}" \
+              --subnet-id "${{ secrets.OCI_SUBNET_ID }}" \
               --assign-public-ip true \
               --display-name "hermes" \
-              --ssh-authorized-keys-file /tmp/ssh_key.pub 2>&1)
+              --ssh-authorized-keys-file /tmp/ssh_key.pub \
+              --connection-timeout 10 \
+              --read-timeout 30 2>&1)
             if echo "$result" | grep -q '"id"'; then
               echo "SUCCESS!"
               echo "$result"
