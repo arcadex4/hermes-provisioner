@@ -32,6 +32,18 @@ jobs:
         run: |
           set +e
           echo "${{ secrets.SSH_PUBLIC_KEY }}" > /tmp/ssh_key.pub
+
+# Check if instance already exists
+          existing=$(oci compute instance list \
+            --compartment-id "${{ secrets.OCI_TENANCY_OCID }}" \
+            --display-name "hermes" \
+            --lifecycle-state "RUNNING" \
+            --query 'data[0].id' 2>&1)
+          if echo "$existing" | grep -q 'ocid1.instance'; then
+            echo "Instance already exists. Nothing to do."
+            exit 0
+          fi
+          
           for AD in "AQIi:US-ASHBURN-AD-1" "AQIi:US-ASHBURN-AD-2" "AQIi:US-ASHBURN-AD-3"; do
             echo "Trying $AD..."
             result=$(oci compute instance launch \
